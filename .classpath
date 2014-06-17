@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/apache-commons-lang.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/commons-beanutils-1.7.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/commons-codec-1.5.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/commons-collections.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/commons-configuration-1.5.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/dcm4che-base64-2.0.21.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/ezmorph.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/gson-2.2.2.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/httpclient-4.0.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/httpcore-4.0.1.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/java-json.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/json-lib-2.2.2-jdk15.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/jsse(1).jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="D:/Comvenientjars/Comvenientjars/opencsv-1.6.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
