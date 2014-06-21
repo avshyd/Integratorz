@@ -13,7 +13,7 @@ public class ProcessingMessage {
 
 	
 	private  PropertiesConfiguration prop;
-	static Logger logger = Logger.getLogger(Consumer.class);
+	static Logger logger = Logger.getLogger(NSTVConsumer.class);
 	
 	//Method for Create session
 	public byte[] createSession(PropertiesConfiguration prop) throws NoSuchAlgorithmException {
@@ -75,6 +75,7 @@ public class ProcessingMessage {
 			createOpenAccountData.append(FileUtils.decToHex(dataBody.length()/2,4)); //DB_Len
 		}
 		createOpenAccountData.append(dataBody);
+		
 		logger.info("Sending Data for Open Account"+createOpenAccountData.toString());
 		
 	byte[] byteArrayData = FileUtils.hexStringToByteArray(createOpenAccountData.toString());
@@ -100,7 +101,7 @@ public class ProcessingMessage {
 		//create MAC using data_body
 		String dataBodyHexString = dataBody.toString();
 		dataBody.append(createMessageAuthCodeUsingDataBody(dataBodyHexString));
-		
+		logger.info("Open Account Card No:"+strCardSN+",MessageId:"+messageId);
 		System.out.println("Open Request Data Body Before Encryption :"+dataBody.toString());
 		logger.info("Open Request Data Body Before Encryption :"+dataBody.toString());
 		//Encrypt Data_Body
@@ -127,7 +128,7 @@ public class ProcessingMessage {
 		while(dataBody.length()%8 != 0){
 			dataBody.append("F0"); //padding bytes
 		}
-		
+		logger.info("Cancel Account Card No:"+strCardSN+",MessageId:"+messageId);
 		//create MAC using data_body
 		String dataBodyHexString = dataBody.toString();
 		dataBody.append(createMessageAuthCodeUsingDataBody(dataBodyHexString));
@@ -190,7 +191,8 @@ public class ProcessingMessage {
 		//create MAC using data_body
 		String dataBodyHexString = dataBody.toString();
 		dataBody.append(createMessageAuthCodeUsingDataBody(dataBodyHexString));
-		
+		logger.info("Extent Entitlment Card No:"+processRequestData.getSmartcardId()+",MessageId:"+messageId+",Start date:"+processRequestData.getStartDate()
+				+",End date:"+processRequestData.getEndDate());
 		System.out.println("Extend Entitlment Data Body Before Encryption :"+dataBody.toString());
 		logger.info("Extend Entitlment Data Body Before Encryption :"+dataBody.toString());
 		
@@ -227,6 +229,8 @@ public class ProcessingMessage {
 		dataBody.append("F0");
 		//create MAC using data_body
 		String dataBodyHexString = dataBody.toString();
+		logger.info("Entitlment Card No:"+processRequestData.getSmartcardId()+",MessageId:"+messageId+",Start date:"+processRequestData.getStartDate()
+				+",End date:"+processRequestData.getEndDate());
 		dataBody.append(createMessageAuthCodeUsingDataBody(dataBodyHexString));
 		
 		System.out.println("Create Entitlment Data Body Before Encryption :"+dataBody.toString());
@@ -281,7 +285,7 @@ public class ProcessingMessage {
 		dataCont.append(FileUtils.decToHex(16,8));//Duration
 		dataBody.append(FileUtils.decToHex(dataCont.length()/2,4));
 		dataBody.append(dataCont);
-		
+		logger.info("OSD Account Card No:"+processRequestData.getSmartcardId()+",MessageId:"+messageId+",Message :"+processRequestData.getProduct());
 		while(dataBody.length()%8 != 0 || (dataBody.length()/2)%8 != 0){
 			dataBody.append("F0"); //padding bytes
 		}

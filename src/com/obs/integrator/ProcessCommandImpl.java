@@ -25,7 +25,7 @@ public class ProcessCommandImpl {
 	private static DataInputStream dataInputStream;
 	private static DataOutputStream dataOutputStream;
 	private static Socket socket = null;
-	static Logger logger = Logger.getLogger(Consumer.class);
+	static Logger logger = Logger.getLogger(NSTVConsumer.class);
 	private PropertiesConfiguration prop;
 	public Timer timer;
 	private String number;
@@ -199,7 +199,8 @@ public class ProcessCommandImpl {
 				}
 				
 				if (processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_ACTIVATION) || 
-						processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_RECONNECT)) {
+					processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_RECONNECT)||
+					processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_RENEWAL_AE)	) {
 
 					Reminder(timePeriod);
 					 messageId=513;
@@ -222,14 +223,14 @@ public class ProcessCommandImpl {
 					
 					   }else{
 						logger.error("Problem to create Entitlment "+processRequestData.getSmartcardId());
-					    process("failure",processRequestData.getId(), processRequestData.getPrdetailsId());
+					    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }
 					
 					}else{
 						 logger.error("Open Account is not Created..");  
 					   }
 					   
-				 }else if(processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_RENEWAL)){
+				 }else if(processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_RENEWAL_BE)){
 						Reminder(timePeriod);
 					   messageId=526;
 					   byte[] bytedatafEntitlmentData = this.processingMessage.processEntiltmentData(processRequestData,messageId);
@@ -240,7 +241,7 @@ public class ProcessCommandImpl {
 						   process("Success",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }else{
 						   logger.info("Entitlment Extension failure");
-						   process("failure",processRequestData.getId(), processRequestData.getPrdetailsId());
+						   process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }
 					 
 				 }else if (processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_DISCONNECTION)) {
@@ -257,7 +258,7 @@ public class ProcessCommandImpl {
 
 					  }else{
 						   logger.error("Account Disconnection is failed. "+processRequestData.getSmartcardId());
-						    process("failure",processRequestData.getId(), processRequestData.getPrdetailsId());
+						    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }
 					  
 				}else if (processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_MESSAGE)) {
@@ -274,11 +275,12 @@ public class ProcessCommandImpl {
 
 					  }else{
 						   logger.error("OSD sent failed. "+processRequestData.getSmartcardId());
-						    process("failure",processRequestData.getId(), processRequestData.getPrdetailsId());
+						    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }
 				}else{
 					System.out.println("RequestType="+processRequestData.getRequestType()+" . Invalid Request Type");
 					logger.info("RequestType="+processRequestData.getRequestType()+" . Invalid Request Type");
+					 process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 				}
 			 
 		} catch (ConfigurationException e) {
@@ -318,7 +320,7 @@ public class ProcessCommandImpl {
 			if(value==null){
 				throw new NullPointerException();
 			}else{	
-				Consumer.sendResponse(value,id,prdetailsId);	
+				NSTVConsumer.sendResponse(value,id,prdetailsId);	
 			}		
 		} catch(NullPointerException e){
 			logger.error("NullPointerException : Output from the Oss System Server is : " + value);
@@ -380,7 +382,7 @@ public class ProcessCommandImpl {
 			logger.error("thread is Interrupted for the : " + e.getCause().getLocalizedMessage());
 		} catch (IOException e) {
 			logger.error("The Socket server connection is DisConnected, ReConnect to the Server");
-			Consumer.getConnection();
+			NSTVConsumer.getConnection();
 		}
 	}
 }

@@ -7,7 +7,8 @@ public class NSTVConstants {
 
 	//For request Type
 	public static final String REQ_ACTIVATION="ACTIVATION";
-	public static final String REQ_RENEWAL="RENEWAL";
+	public static final String REQ_RENEWAL_BE="RENEWAL_BE";
+	public static final String REQ_RENEWAL_AE="RENEWAL_AE";
 	public static final String REQ_DISCONNECTION="DISCONNECTION";
 	public static final String REQ_RECONNECT="RECONNECTION";
     public static final String REQ_MESSAGE="MESSAGE";

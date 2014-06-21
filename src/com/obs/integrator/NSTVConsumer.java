@@ -27,7 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 
-public class Consumer implements Runnable {
+public class NSTVConsumer implements Runnable {
 
 	private static Queue<ProcessRequestData> messageQueue;
 	static Socket requestSocket = null;
@@ -37,7 +37,7 @@ public class Consumer implements Runnable {
 	private static byte[] encoded;
 	private static String tenantIdentifier;
 	private static HttpClient httpClient;
-	static Logger logger = Logger.getLogger(Consumer.class);
+	static Logger logger = Logger.getLogger("");
 	private static ProcessCommandImpl processCommand;
 	public static int wait;
 
@@ -100,7 +100,7 @@ public class Consumer implements Runnable {
 			logger.error(" Connection to the CAS server is Not Established .... , " + e.getMessage());
 			try {
 				Thread.sleep(wait);
-				Consumer.getConnection();
+				NSTVConsumer.getConnection();
 			} catch (InterruptedException e1) {
 				logger.error("thread is Interrupted for the : " + e.getCause().getLocalizedMessage());
 			}
@@ -112,7 +112,7 @@ public class Consumer implements Runnable {
 	}
 
 	@SuppressWarnings("static-access")
-	public Consumer(Queue<ProcessRequestData> queue1,
+	public NSTVConsumer(Queue<ProcessRequestData> queue1,
 			PropertiesConfiguration prop2) {
 		try {
 			this.messageQueue = queue1;
@@ -125,14 +125,14 @@ public class Consumer implements Runnable {
 			tenantIdentifier = prop.getString("tenantIdentfier");
 			String ashok = username.trim() + ":" + password.trim();
 			encoded = Base64.encodeBase64(ashok.getBytes());
-			Consumer.getConnection();
+			NSTVConsumer.getConnection();
 		} catch (Exception e) {
 			logger.error("Exception:" + e.getStackTrace());
 		}
 
 	}
 
-	@Override
+	/*@Override
 	public void run() {
 
 		while (true) {
@@ -148,21 +148,54 @@ public class Consumer implements Runnable {
 
 	private void consume() throws InterruptedException {
 		
-			if (requestSocket != null) {
-				while (!messageQueue.isEmpty()) {
-					synchronized (messageQueue) {
-						for (ProcessRequestData processRequestData : messageQueue) {
-							messageQueue.poll();
-							processCommand.processRequest(processRequestData);
-						}
-						messageQueue.notifyAll();
+		if (requestSocket != null) {
+			while (!messageQueue.isEmpty()) {
+				synchronized (messageQueue) {
+					for (ProcessRequestData processRequestData : messageQueue) {
+						messageQueue.poll();
+						processCommand.processRequest(processRequestData);
 					}
+					messageQueue.notifyAll();
 				}
-			} else {
-				Thread.sleep(wait);
-				Consumer.getConnection();
+				
 			}
+		} else {
+			Thread.sleep(wait);
+			NSTVConsumer.getConnection();
+		}
 		 
+	}*/
+	 public void run() {
+
+		  while (true) {
+		   logger.info("Consumer() class calling ...");
+		   try {
+		    synchronized (messageQueue) {
+		     consume();
+		     messageQueue.wait();
+		    }
+		   } catch (InterruptedException ex) {
+		    logger.error("thread is Interrupted for the : " + ex.getCause().getLocalizedMessage());
+		   }
+		  }
+		 }
+
+	private void consume() throws InterruptedException {
+
+		if (requestSocket != null) {
+			while (!messageQueue.isEmpty()) {
+				for (ProcessRequestData processRequestData : messageQueue) {
+					messageQueue.poll();
+					processCommand.processRequest(processRequestData);
+				}
+				messageQueue.notifyAll();
+			}
+
+		} else {
+			Thread.sleep(wait);
+			NSTVConsumer.getConnection();
+		}
+
 	}
 
 	public static void sendResponse(String output, Long id, Long prdetailsId) throws InterruptedException {
@@ -171,7 +204,7 @@ public class Consumer implements Runnable {
 			post = new HttpPost(prop.getString("BSSQuery").trim() +"/"+ id);
 			post.setHeader("Authorization", "Basic " + new String(encoded));
 			post.setHeader("Content-Type", "application/json");
-			post.addHeader("X-Mifos-Platform-TenantId", tenantIdentifier);
+			post.addHeader("X-Obs-Platform-TenantId", tenantIdentifier);
 
 			JSONObject object = new JSONObject();
 			

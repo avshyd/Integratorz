@@ -34,7 +34,7 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
-public class Producer implements Runnable {
+public class NSTVProducer implements Runnable {
 
 	private int no;
 	private String encodedPassword;
@@ -50,7 +50,7 @@ public class Producer implements Runnable {
 	private static HttpClient httpClient;
 	private static Gson gsonConverter = new Gson();
 	private int wait;
-	static Logger logger = Logger.getLogger(Producer.class);
+	static Logger logger = Logger.getLogger("");
 
 	public static HttpClient wrapClient(HttpClient base) {
 
@@ -99,7 +99,7 @@ public class Producer implements Runnable {
 		}
 	}
 
-	public Producer(Queue<ProcessRequestData> messageQueue1,
+	public NSTVProducer(Queue<ProcessRequestData> messageQueue1,
 			PropertiesConfiguration prop1) {
 		// 1. Here intialize connection object for connecting to the RESTful
 		// service
@@ -119,48 +119,49 @@ public class Producer implements Runnable {
 		encoded = Base64.encodeBase64(encodedPassword.getBytes());
 		getRequest.setHeader("Authorization", "Basic " + new String(encoded));
 		getRequest.setHeader("Content-Type", "application/json");
-		getRequest.addHeader("X-Mifos-Platform-TenantId", tenantIdentifier);
+		getRequest.addHeader("X-Obs-Platform-TenantId", tenantIdentifier);
 		readDataFromRestfulService();
 	}
 
-	@Override
-	public void run() {
-		while (true) {		 			
-				  	
-				try {
-					produce();	
-					Thread.sleep(wait);
-				} catch (InterruptedException e) {
-					logger.error("InterruptedException : " + e.getCause().getLocalizedMessage());
-				}
-		}
-	}
+	 @Override
+	 public void run() {
+	  while (true) {
+	   produce();    
+	   try {
+	    Thread.sleep(wait);
+	   } catch (InterruptedException ex) {
+	    logger.error("thread is Interrupted for the : " + ex.getCause().getLocalizedMessage());
+	   }
+	  }
+	 }
 
-	/**
-	 * Make a RESTful call to fetch the list of messages and add to the message
-	 * queue for processing by the consumer thread.
-	 * @throws InterruptedException 
-	 * 
-	 * @throws IOException
-	 * @throws ClientProtocolException
-	 */
-	private void produce() throws InterruptedException {
-		
-			logger.info("Produce() class calling ...");
+	 /**
+	  * Make a RESTful call to fetch the list of messages and add to the message
+	  * queue for processing by the consumer thread.
+	  * 
+	  * @throws IOException
+	  * @throws ClientProtocolException
+	  */
+	 private void produce() {
+	  try {
+	   logger.info("Produce() class calling ...");
+	      synchronized (messageQueue) {
+	      if (messageQueue.isEmpty()) {
+	    readDataFromRestfulService();
+	    messageQueue.notifyAll();
+	      
+	    }else{
+	     logger.info(" records are Processing .... ");
+	     messageQueue.notifyAll();
+	     Thread.sleep(wait);
+	    }
+	    } 
 
-			if (messageQueue.isEmpty()) {
-				synchronized (messageQueue) {
-					readDataFromRestfulService();
-					messageQueue.notifyAll();
-				}
-			} else {
-				logger.info(" records are Processing .... ");
-				Thread.sleep(wait);
-			}
+	  } catch (InterruptedException e) {
+	   logger.error("thread is Interrupted for the : " + e.getCause().getLocalizedMessage());
+	  }
 
-		
-
-	}
+	 }
 
 	/**
 	 * Change the Message.java class accordingly as per the JSON string of the
@@ -194,7 +195,7 @@ public class Producer implements Runnable {
 				
 				logger.error("Failed : HTTP error code : "
 						+ response.getStatusLine().getStatusCode());
-				return;
+				throw new RuntimeErrorException(null, "Resource NotFound Exception :  BSS server system 'BSSQuery' url error.");			
 				
 			}
 			
