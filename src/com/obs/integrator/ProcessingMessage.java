@@ -56,7 +56,9 @@ public class ProcessingMessage {
 	}
 
      public byte[] processAccountRequest(ProcessRequestData processRequestData, int messageId) throws Exception {
-		
+    	 
+    	 
+		try{
 		StringBuilder createOpenAccountData = new StringBuilder();
 		createOpenAccountData.append(FileUtils.decToHex(1, 2)); //Proto_ver
 		createOpenAccountData.append(FileUtils.decToHex(5, 2)); //Crypt_ver (1) + Key_type (10) = 00000110 = 6
@@ -80,11 +82,16 @@ public class ProcessingMessage {
 		
 	byte[] byteArrayData = FileUtils.hexStringToByteArray(createOpenAccountData.toString());
 		return byteArrayData;
+	}catch(Exception exception){
+		logger.info("Error.:"+exception.getMessage());
+		return null;
+	}
 	}
      
      //Databody For Create account
 	private String createDataBodyForAccountRequest(ProcessRequestData processRequestData, int messageId) throws Exception {
 		
+		try{
 		StringBuilder dataBody = new StringBuilder();
 		dataBody.append(FileUtils.decToHex(prop.getInt("DB_ID") + 1, 4)); //Db_id
 		dataBody.append(FileUtils.decToHex(messageId, 4)); //Msg_id
@@ -110,12 +117,18 @@ public class ProcessingMessage {
 		byte[] encryptedData = encryption.encryptData(dataBody.toString());
 		
 		return new String(Hex.encodeHex(encryptedData));
+	}catch(Exception exception){
+		logger.info("Error.:"+exception.getMessage());
+		return null;
+	}
 	}
 	
 	
 	//For Cancel Account
 	private String createDataBodyForCancelAccountRequest(ProcessRequestData processRequestData, int messageId) throws Exception {
-	
+		
+		
+	try{
 		StringBuilder dataBody = new StringBuilder();
 		dataBody.append(FileUtils.decToHex(prop.getInt("DB_ID") + 1, 4)); //Db_id
 		dataBody.append(FileUtils.decToHex(messageId,4)); //Msg_id
@@ -139,6 +152,10 @@ public class ProcessingMessage {
 		encryption.initDesAlgorithm();
 		byte[] encryptedData = encryption.encryptData(dataBody.toString());
 		return new String(Hex.encodeHex(encryptedData));
+	}catch(Exception exception){
+		logger.info("Error.:"+exception.getMessage());
+		return null;
+	}
 	}
 
 	public byte[] processEntiltmentData(ProcessRequestData processRequestData, int messageId) throws Exception {
@@ -169,6 +186,7 @@ public class ProcessingMessage {
 	//For Entitlement databody 
 	private String createDataBodyForEntitlmentExtent(ProcessRequestData processRequestData, int messageId) throws Exception {
 		
+		try{
 		StringBuilder dataBody = new StringBuilder();
 		dataBody.append(FileUtils.decToHex(1, 4)); //Db_id
 		dataBody.append(FileUtils.decToHex(messageId, 4)); //Msg_id
@@ -204,9 +222,15 @@ public class ProcessingMessage {
 		return new  String(Hex.encodeHex(encryptedData)); //bytesToHex(encryptedData, 0, encryptedData.length);
 	//return dataBody.toString();
 
+	}catch(Exception exception){
+		logger.info("Error.:"+exception.getMessage());
+		return null;
+	}
 	}
 
 	private String createDataBodyForCreateEntitlment(ProcessRequestData processRequestData, int messageId) throws Exception {
+		
+		try{
 		
 		StringBuilder dataBody = new StringBuilder();
 		dataBody.append(FileUtils.decToHex(1, 4)); //Db_id
@@ -244,6 +268,10 @@ public class ProcessingMessage {
 		return new  String(Hex.encodeHex(encryptedData)); //bytesToHex(encryptedData, 0, encryptedData.length);
 	//return dataBody.toString();
 
+	}catch(Exception exception){
+		logger.info("Error.:"+exception.getMessage());
+		return null;
+	}
 	}
 
 	public byte[] processOsdRequest(ProcessRequestData processRequestData,int messageId) throws Exception {
@@ -268,6 +296,8 @@ public class ProcessingMessage {
 	}
 
 	private String createDataBodyForOsd(ProcessRequestData processRequestData,int messageId) throws Exception {
+		
+		try{
 		
 		StringBuilder dataBody = new StringBuilder();
 		dataBody.append(FileUtils.decToHex(1, 4)); //Db_id
@@ -303,11 +333,13 @@ public class ProcessingMessage {
 		byte[] encryptedData = encryption.encryptData(dataBody.toString());
 		
 		return new  String(Hex.encodeHex(encryptedData)); 
-	
-
+		}catch(Exception exception){
+			logger.info("Error.:"+exception.getMessage());
+			return null;
+		
 	}
 
-
+	}
 	
 
 }

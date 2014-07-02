@@ -205,10 +205,12 @@ public class ProcessCommandImpl {
 					Reminder(timePeriod);
 					 messageId=513;
 					 byte[] bytedataforopenAcc=this.processingMessage.processAccountRequest(processRequestData,messageId);
+					 if(bytedataforopenAcc != null){
 					   send(dataOutputStream, bytedataforopenAcc);
 					   String response=receiveResponseAndProcess();
-					   
-					   if(response.equalsIgnoreCase(NSTVConstants.RES_OPENACCOUNT)){
+					   if(response == null){
+						   process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+					   }else if(response.equalsIgnoreCase(NSTVConstants.RES_OPENACCOUNT)){
 							Reminder(timePeriod);
 						   logger.error("Open Account is Created with card "+processRequestData.getSmartcardId());  
 							messageId=525;
@@ -225,33 +227,49 @@ public class ProcessCommandImpl {
 						logger.error("Problem to create Entitlment "+processRequestData.getSmartcardId());
 					    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }
-					
+					   }
 					}else{
 						 logger.error("Open Account is not Created..");  
-					   }
+						 process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+					 }
 					   
 				 }else if(processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_RENEWAL_BE)){
+					 
 						Reminder(timePeriod);
 					   messageId=526;
 					   byte[] bytedatafEntitlmentData = this.processingMessage.processEntiltmentData(processRequestData,messageId);
+					   if(bytedatafEntitlmentData != null){
 					   send(dataOutputStream, bytedatafEntitlmentData);
 					    String response=receiveResponseAndProcess();
-					   if(response.equalsIgnoreCase(NSTVConstants.RES_EXTENTENTITLMENT)){
+					    if(response == null){
+					    	
+							   process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+						   }else if(response.equalsIgnoreCase(NSTVConstants.RES_EXTENTENTITLMENT)){
 						   logger.info("Entitlment Extension is done sucessfully");
 						   process("Success",processRequestData.getId(), processRequestData.getPrdetailsId());
-					   }else{
+						   }else{
+							   logger.info("Entitlment Extension failure");
+							   process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+						   }
+					    }else{
 						   logger.info("Entitlment Extension failure");
 						   process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+					   
 					   }
-					 
-				 }else if (processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_DISCONNECTION)) {
-					Reminder(timePeriod);
-					   messageId=514;
+			   }else if (processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_DISCONNECTION)) {
+				   
+				   
+					             Reminder(timePeriod);
+					            messageId=514;
 					  byte[] bytedataforopenAcc=this.processingMessage.processAccountRequest(processRequestData,messageId);
+					  if(bytedataforopenAcc != null){
 					  send(dataOutputStream, bytedataforopenAcc);
 					  String response=receiveResponseAndProcess();
 
-					  if(response.equalsIgnoreCase(NSTVConstants.RES_CANCELACCOUNT)){
+					  if(response == null){
+						   process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+						   
+					   }else if(response.equalsIgnoreCase(NSTVConstants.RES_CANCELACCOUNT)){
 						  
 						   logger.info("Account is stopped successfully ..."+processRequestData.getSmartcardId());  
 							process("Success",processRequestData.getId(), processRequestData.getPrdetailsId());
@@ -260,15 +278,24 @@ public class ProcessCommandImpl {
 						   logger.error("Account Disconnection is failed. "+processRequestData.getSmartcardId());
 						    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }
+					  }else{
+						  logger.error("Account Disconnection is failed. "+processRequestData.getSmartcardId());
+						    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+					  }
 					  
 				}else if (processRequestData.getRequestType().equalsIgnoreCase(NSTVConstants.REQ_MESSAGE)) {
 				   	 Reminder(timePeriod);
 					   messageId=772;
 					  byte[] bytedataforOsd=this.processingMessage.processOsdRequest(processRequestData,messageId);
+					  
+					  if(bytedataforOsd != null){
 					  send(dataOutputStream, bytedataforOsd);
 					  String response=receiveResponseAndProcess();
-
-					  if(response.equalsIgnoreCase(NSTVConstants.RES_OSD)){
+					  
+					  if(response == null){
+						   process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+					   
+					  }else if(response.equalsIgnoreCase(NSTVConstants.RES_OSD)){
 						  
 						   logger.info("OSD sent successfully ..."+processRequestData.getSmartcardId());  
 							process("Success",processRequestData.getId(), processRequestData.getPrdetailsId());
@@ -277,6 +304,10 @@ public class ProcessCommandImpl {
 						   logger.error("OSD sent failed. "+processRequestData.getSmartcardId());
 						    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
 					   }
+				}else{
+					logger.error("OSD sent failed. "+processRequestData.getSmartcardId());
+				    process("failure :",processRequestData.getId(), processRequestData.getPrdetailsId());
+				}
 				}else{
 					System.out.println("RequestType="+processRequestData.getRequestType()+" . Invalid Request Type");
 					logger.info("RequestType="+processRequestData.getRequestType()+" . Invalid Request Type");
